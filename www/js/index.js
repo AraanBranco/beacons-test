@@ -10,37 +10,53 @@ pin["MiniBeacon_00791"] = "pin_2";
 pin["MiniBeacon_00783"] = "pin_3";
 pin["MiniBeacon_00721"] = "pin_4";
 
+pin["Intercect_1"] = "pin_1_2";
+pin["Intercect_2"] = "pin_2_3";
+pin["Intercect_3"] = "pin_3_4";
+
 var positions = [];
 
 positions['pin_1'] = {
-  top: "29px",
-  right: "413px"
+  top: "40px",
+  right: "443px"
+}
+
+positions['pin_1_2'] = {
+  top: "40px",
+  right: "553px"
 }
 
 positions['pin_2'] = {
-  top: "29px",
-  left: "19px",
+  top: "40px",
+  left: "8px",
+}
+
+positions['pin_2_3'] = {
+  top: "270px",
+  left: "8px",
 }
 
 positions['pin_3'] = {
-  left: "19px",
-  bottom: "72px",
+  left: "8px",
+  bottom: "84px",
+}
+
+positions['pin_3_4'] = {
+  left: "250px",
+  bottom: "84px",
 }
 
 positions['pin_4'] = {
-  right: "125px",
-  bottom: "70px",
+  right: "25px",
+  bottom: "84px",
 }
 
 var beacons = {}, pseudo = {};
 
-var app =
-{
+var app = {
   callback: null,
-  initialize: function(callback)
-  {
+  initialize: function(callback) {
     this.callback = callback;
-
     //If testing on a desktop, automatically resolve PhoneGap
     if (document.URL.match(/^https?:/) || document.URL.match(/^file:/)) {
       pgReady.resolve();
@@ -52,16 +68,17 @@ var app =
   }
 };
 
-$(document).on("pagecreate", function()
-{
+$(document).on("pagecreate", function() {
   //Resolve jQuery Mobile
   jqmReady.resolve();
   $(document).off("pagecreate");
 });
 
-$.when(jqmReady, pgReady).then(function() {
+$.when(jqmReady, pgReady).then(function()
+{
   //When PhoneGap and jQuery Mobile are resolved, start the app
-  if (app.callback !== null) {
+  if (app.callback !== null)
+  {
     app.callback();
   }
 });
@@ -73,7 +90,7 @@ function onDeviceReady() {
 
 
 app.initialize(function() {
-  document.addEventListener("click", initialize, false);
+  $(document).on('vclick', initialize);
 })
 
 function initialize() {
@@ -86,14 +103,13 @@ function initialize() {
   return false;
 }
 
-function initializeSuccess(obj)
-{
+function initializeSuccess(obj) {
   console.log("Initialize Success : " + JSON.stringify(obj));
 
   if (obj.status == "enabled") {
     console.log("Enabled");
 
-    startScan();
+    $(MeuAjax);
   }
   else
   {
@@ -101,8 +117,12 @@ function initializeSuccess(obj)
   }
 }
 
-function initializeError(obj)
-{
+function MeuAjax() {
+  setTimeout("MeuAjax()", 500);
+  startScan();
+}
+
+function initializeError(obj) {
   console.log("Initialize Error : " + JSON.stringify(obj));
 }
 
@@ -180,7 +200,6 @@ function startScanSuccess(obj){
     if (obj.status == "scanResult") {
       beacons[obj.name] = obj.rssi;
 
-      console.log(JSON.stringify(beacons));
       addPin(beacons);
     } else if (obj.status == "scanStarted") {
       console.log("Scan Started");
@@ -376,7 +395,25 @@ function rssi(address)
 function addPin(beacons) {
   var objOrdered = Object.keys(beacons).sort(function(a,b){return beacons[a]-beacons[b]});
   var last = parseInt(objOrdered.length - 1);
-  var pinHere = pin[objOrdered[last]];
+  var obj;
+
+  if(objOrdered[last] == -85 && objOrdered[last-1]) {
+    switch(objOrdered[last]) {
+      case 'pin_1':
+        obj = "Intercect_1";
+      break;
+      case 'pin_2':
+        obj = "Intercect_2";
+      break;
+      case 'pin_3':
+        obj = "Intercect_3";
+      break;
+    }
+  } else {
+    obj = objOrdered[last];
+  }
+
+  var pinHere = pin[obj];
 
   $(".im").removeAttr('style');
   $(".im").css(positions[pinHere]);

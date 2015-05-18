@@ -9,7 +9,7 @@ html{color:#000;background:#fff}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre
 
 #mapa {
 	width: 650px;
-	height: 384px;
+	height: 604px;
 	background: url(../img/mapa-panda.png) no-repeat center center;
 	background-size: cover;
 	position: absolute;
@@ -21,19 +21,19 @@ html{color:#000;background:#fff}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre
 
 /* Beacons */
 .beacon {width: 30px; height: 30px; background: url(../img/beacon.png) no-repeat center center; position: absolute; }
-.top {top: 65px; }
-.bottom {bottom: 60px; }
+.top {top: 75px; }
+.bottom {bottom: 70px; }
 
 .pin-1 {
-	right: 408px;
+	right: 438px;
 }
 
 .pin-2, .pin-3 {
-	left: 16px;
+	left: 3px;
 }
 
 .pin-4 {
-	right: 120px;
+	right: 20px;
 }
 
 .im {
