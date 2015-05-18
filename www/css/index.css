@@ -1,0 +1,46 @@
+/*Reset*/
+html{color:#000;background:#fff}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal}ol,ul{list-style:none}caption,th{text-align:left}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}q:before,q:after{content:''}abbr,acronym{border:0;font-variant:normal}sup{vertical-align:text-top}sub{vertical-align:text-bottom}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;font-size:100%}legend{color:#000}
+
+#container {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+#mapa {
+	width: 650px;
+	height: 384px;
+	background: url(../img/mapa-panda.png) no-repeat center center;
+	background-size: cover;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+/* Beacons */
+.beacon {width: 30px; height: 30px; background: url(../img/beacon.png) no-repeat center center; position: absolute; }
+.top {top: 65px; }
+.bottom {bottom: 60px; }
+
+.pin-1 {
+	right: 408px;
+}
+
+.pin-2, .pin-3 {
+	left: 16px;
+}
+
+.pin-4 {
+	right: 120px;
+}
+
+.im {
+	width: 21px;
+	height: 51px;
+	position: absolute;
+	background: url(../img/eu.png) no-repeat center center;
+}
+
+/* Pins */
