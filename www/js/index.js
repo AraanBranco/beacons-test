@@ -15,10 +15,16 @@ pin["Intercect_2"] = "pin_2_3";
 pin["Intercect_3"] = "pin_3_4";
 
 var positions = [];
+var bg = [];
 
 positions['pin_1'] = {
   top: "40px",
   right: "443px"
+}
+
+bg['pin_1'] = {
+  left: "0px",
+  top: "0px"
 }
 
 positions['pin_1_2'] = {
@@ -31,6 +37,11 @@ positions['pin_2'] = {
   left: "8px",
 }
 
+bg['pin_2'] = {
+  left: "-40px",
+  top: "0px"
+}
+
 positions['pin_2_3'] = {
   top: "270px",
   left: "8px",
@@ -38,7 +49,12 @@ positions['pin_2_3'] = {
 
 positions['pin_3'] = {
   left: "8px",
-  bottom: "84px",
+  bottom: "84px"
+}
+
+bg['pin_3'] = {
+  left: "0",
+  bottom: "0"
 }
 
 positions['pin_3_4'] = {
@@ -49,6 +65,11 @@ positions['pin_3_4'] = {
 positions['pin_4'] = {
   right: "25px",
   bottom: "84px",
+}
+
+bg['pin_4'] = {
+  left: "-350px",
+  bottom: "0px"
 }
 
 var beacons = {}, pseudo = {};
@@ -395,28 +416,11 @@ function rssi(address)
 function addPin(beacons) {
   var objOrdered = Object.keys(beacons).sort(function(a,b){return beacons[a]-beacons[b]});
   var last = parseInt(objOrdered.length - 1);
-  var obj;
-
-  if(objOrdered[last] == -85 && objOrdered[last-1]) {
-    switch(objOrdered[last]) {
-      case 'pin_1':
-        obj = "Intercect_1";
-      break;
-      case 'pin_2':
-        obj = "Intercect_2";
-      break;
-      case 'pin_3':
-        obj = "Intercect_3";
-      break;
-    }
-  } else {
-    obj = objOrdered[last];
-  }
-
-  var pinHere = pin[obj];
+  var pinHere = pin[objOrdered[last]];
 
   $(".im").removeAttr('style');
   $(".im").css(positions[pinHere]);
+  $('#mapa').css(bg[pinHere]);
 
   stopScan();
 }

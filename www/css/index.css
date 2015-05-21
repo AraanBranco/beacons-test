@@ -37,10 +37,10 @@ html{color:#000;background:#fff}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre
 }
 
 .im {
-	width: 21px;
+	width: 47px;
 	height: 51px;
 	position: absolute;
-	background: url(../img/eu.png) no-repeat center center;
+	background: url(../img/panda.png) no-repeat center center;
 }
 
 /* Pins */
