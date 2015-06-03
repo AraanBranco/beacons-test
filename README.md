@@ -1,5 +1,4 @@
-# beacons-test
-	
 Aplicação de teste com ibeacons
 
-##Renan - Chegando
+2015-06-02
+Implementado os ibeacons do Estimote

@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.cordova.hellocordova" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="io.cordova.pandalocation" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Panda Location</name>
     <description> Aplicativo de teste com ibeacons </description>
-    <author email="araan666@gmail.com" href="http://cordova.io"> Araan Branco </author>
+    <author email="araan666@gmail.com" href="https://github.com/AraanBranco"> Araan Branco </author>
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />

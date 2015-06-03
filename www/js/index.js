@@ -1,21 +1,14 @@
-var bluetoothle;
-
-var jqmReady = $.Deferred();
-var pgReady = $.Deferred();
-
 var pin = [];
-
-pin["MiniBeacon_00796"] = "pin_1";
-pin["MiniBeacon_00791"] = "pin_2";
-pin["MiniBeacon_00783"] = "pin_3";
-pin["MiniBeacon_00721"] = "pin_4";
-
-pin["Intercect_1"] = "pin_1_2";
-pin["Intercect_2"] = "pin_2_3";
-pin["Intercect_3"] = "pin_3_4";
-
 var positions = [];
 var bg = [];
+
+pin[1] = "pin_1";
+pin[2] = "pin_2";
+pin[3] = "pin_3";
+
+pin[4] = "pin_1_2";
+pin[5] = "pin_2_3";
+pin[6] = "pin_3_4";
 
 positions['pin_1'] = {
   top: "40px",
@@ -72,355 +65,95 @@ bg['pin_4'] = {
   bottom: "0px"
 }
 
-var beacons = {}, pseudo = {};
+var app = (function() {
+  // Application object.
+  var app = {};
 
-var app = {
-  callback: null,
-  initialize: function(callback) {
-    this.callback = callback;
-    //If testing on a desktop, automatically resolve PhoneGap
-    if (document.URL.match(/^https?:/) || document.URL.match(/^file:/)) {
-      pgReady.resolve();
+  // Dictionary of beacons.
+  var beacons = {};
+
+  // Timer that displays list of beacons.
+  var updateTimer = null;
+
+  app.initialize = function() {
+    document.addEventListener('deviceready', onDeviceReady, false);
+  };
+
+  function onDeviceReady() {
+    // Specify a shortcut for the location manager holding the iBeacon functions.
+    window.estimote = EstimoteBeacons;
+
+    // Start tracking beacons!
+    startScan();
+
+    // Display refresh timer.
+    updateTimer = setInterval(displayBeaconList, 500);
+  }
+
+  function startScan() {
+    function onBeaconsRanged(beaconInfo) {
+      
+      beacons = beaconInfo.beacons;
+      for (var i in beaconInfo.beacons) {
+        var beacon = beaconInfo.beacons[i];
+        addPin(beacon);
+      }
     }
-    //Else if on a mobile device, add event listener for deviceready
-    else {
-      document.addEventListener("deviceready", onDeviceReady, false);
+
+    function onError(errorMessage) {
+      console.log('Ranging beacons did fail: ' + errorMessage);
     }
+
+    // Request authorization
+    estimote.requestAlwaysAuthorization();
+
+    // Start ranging beacons.
+    estimote.startRangingBeaconsInRegion(
+      {}, // Empty region matches all beacons
+          // with the Estimote factory set UUID.
+      onBeaconsRanged,
+      onError);
   }
-};
 
-$(document).on("pagecreate", function() {
-  //Resolve jQuery Mobile
-  jqmReady.resolve();
-  $(document).off("pagecreate");
-});
+  function displayBeaconList() {
 
-$.when(jqmReady, pgReady).then(function()
-{
-  //When PhoneGap and jQuery Mobile are resolved, start the app
-  if (app.callback !== null)
-  {
-    app.callback();
+    $.each(beacons, function(key, beacon) {
+      var pinHere = pin[beacon.minor];
+      var proximity = beacon.proximity;
+      var proximityNames = [
+        'Unknown',
+        'Immediate',
+        'Near',
+        'Far'
+      ];
+
+      if(proximityNames[proximity] == "Immediate") {
+        $(".im").removeAttr('style');
+        $(".im").css(positions[pinHere]);
+        //$('#mapa').css(bg[pinHere]);
+      }
+    });
   }
-});
 
-function onDeviceReady() {
-  //Resolve PhoneGap after deviceready has fired
-  pgReady.resolve();
-}
+  return app;
+})();
 
-
-app.initialize(function() {
-  $(document).on('vclick', initialize);
-})
-
-function initialize() {
-  var paramsObj = {request:true};
-
-  console.log("Initialize : " + JSON.stringify(paramsObj));
-
-  bluetoothle.initialize(initializeSuccess, initializeError, paramsObj);
-
-  return false;
-}
-
-function initializeSuccess(obj) {
-  console.log("Initialize Success : " + JSON.stringify(obj));
-
-  if (obj.status == "enabled") {
-    console.log("Enabled");
-
-    $(MeuAjax);
-  }
-  else
-  {
-    console.log("Unexpected Initialize Status");
-  }
-}
-
-function MeuAjax() {
-  setTimeout("MeuAjax()", 500);
-  startScan();
-}
-
-function initializeError(obj) {
-  console.log("Initialize Error : " + JSON.stringify(obj));
-}
-
-function enable()
-{
-  console.log("Enable");
-
-  bluetoothle.enable(enableSuccess, enableError);
-
-  return false;
-}
-
-function enableSuccess(obj)
-{
-  console.log("Enable Success : " + JSON.stringify(obj));
-
-  if (obj.status == "enabled")
-  {
-    console.log("Enabled");
-  }
-  else
-  {
-    console.log("Unexpected Enable Status");
-  }
-}
-
-function enableError(obj)
-{
-  console.log("Enable Error : " + JSON.stringify(obj));
-}
-
-function disable()
-{
-  console.log("Disable");
-
-  bluetoothle.disable(disableSuccess, disableError);
-
-  return false;
-}
-
-function disableSuccess(obj)
-{
-  console.log("Disable Success : " + JSON.stringify(obj));
-
-  if (obj.status == "disabled")
-  {
-    console.log("Disabled");
-  }
-  else
-  {
-    console.log("Unexpected Disable Status");
-  }
-}
-
-function disableError(obj)
-{
-  console.log("Disable Error : " + JSON.stringify(obj));
-}
-
-function startScan() {
-  //TODO Disconnect / Close all addresses and empty
-
-  var paramsObj = {serviceUuids:[]};
-
-  console.log("Start Scan : " + JSON.stringify(paramsObj));
-
-  bluetoothle.startScan(startScanSuccess, startScanError, paramsObj);
-
-  return false;
-}
-
-function startScanSuccess(obj){
-
-  if(obj.name.match(/MiniBeacon/g)) {
-    if (obj.status == "scanResult") {
-      beacons[obj.name] = obj.rssi;
-
-      addPin(beacons);
-    } else if (obj.status == "scanStarted") {
-      console.log("Scan Started");
-    } else {
-      console.log("Unexpected Start Scan Status");
-    }
-  }
-}
-
-function startScanError(obj) {
-  console.log("Start Scan Error : " + JSON.stringify(obj));
-}
-
-function stopScan()
-{
-  console.log("Stop Scan");
-
-  bluetoothle.stopScan(stopScanSuccess, stopScanError);
-
-  return false;
-}
-
-function stopScanSuccess(obj)
-{
-  console.log("Stop Scan Success : " + JSON.stringify(obj));
-
-  if (obj.status == "scanStopped")
-  {
-    console.log("Scan Stopped");
-  }
-  else
-  {
-    console.log("Unexpected Stop Scan Status");
-  }
-}
-
-function stopScanError(obj)
-{
-  console.log("Stop Scan Error : " + JSON.stringify(obj));
-}
-
-
-function connect(address)
-{
-  var paramsObj = {address:address};
-
-   console.log("Connect : " + JSON.stringify(paramsObj));
-
-  bluetoothle.connect(connectSuccess, connectError, paramsObj);
-
-  return false;
-}
-
-function connectSuccess(obj)
-{
-  console.log("Connect Success : " + JSON.stringify(obj));
-
-  if (obj.status == "connected")
-  {
-    console.log("Connected");
-  }
-  else if (obj.status == "connecting")
-  {
-    console.log("Connecting");
-  }
-  else
-  {
-    console.log("Unexpected Connect Status");
-  }
-}
-
-function connectError(obj)
-{
-  console.log("Connect Error : " + JSON.stringify(obj));
-}
-
-function reconnect(address)
-{
-  var paramsObj = {address:address};
-
-  console.log("Reconnect : " + JSON.stringify(paramsObj));
-
-  bluetoothle.reconnect(reconnectSuccess, reconnectError, paramsObj);
-
-  return false;
-}
-
-function reconnectSuccess(obj)
-{
-  console.log("Reconnect Success : " + JSON.stringify(obj));
-
-  if (obj.status == "connected")
-  {
-    console.log("Connected");
-  }
-  else if (obj.status == "connecting")
-  {
-    console.log("Connecting");
-  }
-  else
-  {
-    console.log("Unexpected Reconnect Status");
-  }
-}
-
-function reconnectError(obj)
-{
-  console.log("Reconnect Error : " + JSON.stringify(obj));
-}
-
-function disconnect(address)
-{
-  var paramsObj = {address:address};
-
-  console.log("Disconnect : " + JSON.stringify(paramsObj));
-
-  bluetoothle.disconnect(disconnectSuccess, disconnectError, paramsObj);
-
-  return false;
-}
-
-function disconnectSuccess(obj)
-{
-  console.log("Disconnect Success : " + JSON.stringify(obj));
-
-  if (obj.status == "disconnected")
-  {
-    console.log("Disconnected");
-  }
-  else if (obj.status == "disconnecting")
-  {
-    console.log("Disconnecting");
-  }
-  else
-  {
-    console.log("Unexpected Disconnect Status");
-  }
-}
-
-function disconnectError(obj)
-{
-  console.log("Disconnect Error : " + JSON.stringify(obj));
-}
-
-function close(address)
-{
-  var paramsObj = {address:address};
-
-  console.log("Close : " + JSON.stringify(paramsObj));
-
-  bluetoothle.close(closeSuccess, closeError, paramsObj);
-
-  return false;
-}
-
-function closeSuccess(obj)
-{
-  console.log("Close Success : " + JSON.stringify(obj));
-
-  if (obj.status == "closed")
-  {
-    console.log("Closed");
-  }
-  else
-  {
-    console.log("Unexpected Close Status");
-  }
-}
-
-function closeError(obj)
-{
-  console.log("Close Error : " + JSON.stringify(obj));
-}
-
-
-function servicesError(obj)
-{
-  console.log("Services Error : " + JSON.stringify(obj));
-}
-
-function rssi(address)
-{
-  var paramsObj = {address:address};
-
-  console.log("RSSI : " + JSON.stringify(paramsObj));
-
-  bluetoothle.rssi(rssiSuccess, rssiError, paramsObj);
-
-  return false;
-}
+app.initialize();
 
 // Move Pin in MAP
-function addPin(beacons) {
-  var objOrdered = Object.keys(beacons).sort(function(a,b){return beacons[a]-beacons[b]});
-  var last = parseInt(objOrdered.length - 1);
-  var pinHere = pin[objOrdered[last]];
+function addPin(beacon) {
+  var pinHere = pin[beacon.minor];
+  var proximity = beacon.proximity;
+  var proximityNames = [
+    'Unknown',
+    'Immediate',
+    'Near',
+    'Far'
+  ];
 
-  $(".im").removeAttr('style');
-  $(".im").css(positions[pinHere]);
-  $('#mapa').css(bg[pinHere]);
-
-  stopScan();
+  if(proximityNames[proximity] == "Near") {
+    $(".im").removeAttr('style');
+    $(".im").css(positions[pinHere]);
+    //$('#mapa').css(bg[pinHere]);
+  }
 }
