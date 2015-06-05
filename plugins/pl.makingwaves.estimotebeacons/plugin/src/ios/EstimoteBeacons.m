@@ -489,26 +489,51 @@ Example: http://192.168.0.101:4042
 
 /**
  * Start CoreLocation ranging.
+[self.commandDelegate runInBackground:
+	^{
+		NSMutableArray* output = [NSMutableArray array];
+
+		if ([self.beacons count] > 0)
+		{
+			//convert list of beacons to a an array of simple property-value objects
+			for (id beacon in self.beacons)
+			{
+				[output addObject:[self beaconToDictionary:beacon]];
+			}
+		}
+
+		CDVPluginResult* pluginResult = [CDVPluginResult
+			resultWithStatus:CDVCommandStatus_OK
+			messageAsArray:output];
+
+		[self.commandDelegate
+			sendPluginResult:pluginResult
+			callbackId:command.callbackId];
+	}];
+
  */
 - (void) beacons_startRangingBeaconsInRegion:(CDVInvokedUrlCommand*)command
 {
-	//NSLog(@"OBJC startRangingBeaconsInRegion");
+	// NSLog(@"OBJC startRangingBeaconsInRegion");
 
 	// Get region dictionary passed from JavaScript and
 	// create a beacon region object.
-	NSDictionary* regionDictionary = [command argumentAtIndex:0];
-	ESTBeaconRegion* region = [self createRegionFromDictionary:regionDictionary];
+	[self.commandDelegate runInBackground:
+	^{
+		NSDictionary* regionDictionary = [command argumentAtIndex:0];
+		ESTBeaconRegion* region = [self createRegionFromDictionary:regionDictionary];
 
-	// Stop any ongoing ranging for the given region.
-	[self helper_stopRangingBeaconsInRegion:region];
+		// Stop any ongoing ranging for the given region.
+		[self helper_stopRangingBeaconsInRegion:region];
 
-	// Save callback id for the region.
-	[self.callbackIds_beaconsRanging
-		setObject:command.callbackId
-		forKey:[self regionDictionaryKey:region]];
+		// Save callback id for the region.
+		[self.callbackIds_beaconsRanging
+			setObject:command.callbackId
+			forKey:[self regionDictionaryKey:region]];
 
-	// Start ranging.
-	[self.beaconManager startRangingBeaconsInRegion:region];
+		// Start ranging.
+		[self.beaconManager startRangingBeaconsInRegion:region];
+	}];
 }
 
 /**

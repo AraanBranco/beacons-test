@@ -2,6 +2,13 @@ var pin = [];
 var positions = [];
 var bg = [];
 
+var beaconActive = {};
+
+beaconActive.minor = "";
+beaconActive.meters = "";
+beaconActive.distance = "";
+
+
 pin[1] = "pin_1";
 pin[2] = "pin_2";
 pin[3] = "pin_3";
@@ -87,7 +94,7 @@ var app = (function() {
     startScan();
 
     // Display refresh timer.
-    updateTimer = setInterval(displayBeaconList, 500);
+    updateTimer = setInterval(displayBeaconList, 100);
   }
 
   function startScan() {
@@ -96,7 +103,20 @@ var app = (function() {
       beacons = beaconInfo.beacons;
       for (var i in beaconInfo.beacons) {
         var beacon = beaconInfo.beacons[i];
-        addPin(beacon);
+        var minor = beacon.minor;
+        var distance = 0;
+        var meters = "";
+        var proximity = beacon.proximity;
+
+        if (beacon.distance > 1) {
+          distance = beacon.distance.toFixed(3);
+          meters = "m";
+        } else {
+          distance = (beacon.distance * 100).toFixed(3);
+          meters = "cm";
+        }
+
+        checkProximity(distance, meters, minor);
       }
     }
 
@@ -106,13 +126,9 @@ var app = (function() {
 
     // Request authorization
     estimote.requestAlwaysAuthorization();
-
+    
     // Start ranging beacons.
-    estimote.startRangingBeaconsInRegion(
-      {}, // Empty region matches all beacons
-          // with the Estimote factory set UUID.
-      onBeaconsRanged,
-      onError);
+    estimote.startRangingBeaconsInRegion({}, onBeaconsRanged, onError);
   }
 
   function displayBeaconList() {
@@ -140,10 +156,23 @@ var app = (function() {
 
 app.initialize();
 
+function checkProximity(distance, meters, minor) {
+  if(beaconActive.minor != "") {
+    if(beaconActive.minor != minor) {
+      if (beaconActive.meters == meters && Math.round(distance) <= 2 && Math.round(beaconActive.distance) <= 2 ) {
+        
+      }
+    }
+  } else {
+    beaconActive.distance = distance;
+    beaconActive.meters = meters;
+    beaconActive.minor = minor;
+  }
+}
+
 // Move Pin in MAP
-function addPin(beacon) {
-  var pinHere = pin[beacon.minor];
-  var proximity = beacon.proximity;
+function addPin(minor, proximity) {
+  var pinHere = pin[minor];
   var proximityNames = [
     'Unknown',
     'Immediate',
@@ -151,7 +180,7 @@ function addPin(beacon) {
     'Far'
   ];
 
-  if(proximityNames[proximity] == "Near") {
+  if(proximityNames[proximity] == "Immediate") {
     $(".im").removeAttr('style');
     $(".im").css(positions[pinHere]);
     //$('#mapa').css(bg[pinHere]);
