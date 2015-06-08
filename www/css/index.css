@@ -9,31 +9,31 @@ html{color:#000;background:#fff}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre
 
 #mapa {
 	width: 650px;
-	height: 604px;
-	background: url(../img/mapa-panda.png) no-repeat center center;
-	background-size: cover;
+	height: 735px;
+	background: url(../img/mapa.jpg) no-repeat center center;
+	background-size: contain;
 	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
 }
 
 /* Beacons */
-.beacon {width: 30px; height: 30px; background: url(../img/beacon.png) no-repeat center center; position: absolute; }
-.top {top: 75px; }
-.bottom {bottom: 70px; }
+.beacon {width: 30px; height: 30px; background: url(../img/beacon.png) no-repeat center center; position: absolute; background-size: contain }
 
 .pin-1 {
-	right: 438px;
+	left: 90px;
+	bottom: 330px;
+	background-color: #872369;
 }
 
-.pin-2, .pin-3 {
-	left: 3px;
+.pin-2 {
+	left: 90px;
+	bottom: 30px;
+	background-color: rgb(165,213,209);
 }
 
-.pin-4 {
-	right: 20px;
+.pin-3 {
+	right: 110px;
+	top: 40px;
+	background-color: #5c58a7;
 }
 
 .im {

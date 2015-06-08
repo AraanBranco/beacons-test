@@ -13,63 +13,34 @@ pin[1] = "pin_1";
 pin[2] = "pin_2";
 pin[3] = "pin_3";
 
-pin[4] = "pin_1_2";
-pin[5] = "pin_2_3";
-pin[6] = "pin_3_4";
-
 positions['pin_1'] = {
-  top: "40px",
-  right: "443px"
-}
-
-bg['pin_1'] = {
-  left: "0px",
-  top: "0px"
-}
-
-positions['pin_1_2'] = {
-  top: "40px",
-  right: "553px"
+  left: "90px",
+  bottom: "320px"
 }
 
 positions['pin_2'] = {
-  top: "40px",
-  left: "8px",
-}
-
-bg['pin_2'] = {
-  left: "-40px",
-  top: "0px"
-}
-
-positions['pin_2_3'] = {
-  top: "270px",
-  left: "8px",
+  left: "90px",
+  bottom: "30px",
 }
 
 positions['pin_3'] = {
-  left: "8px",
-  bottom: "84px"
+  right: "100px",
+  top: "20px"
+}
+
+bg['pin_1'] = {
+  top: "-100px",
+  left: "0px"
+}
+
+bg['pin_2'] = {
+  top: "-200px",
+  left: "0px"
 }
 
 bg['pin_3'] = {
-  left: "0",
-  bottom: "0"
-}
-
-positions['pin_3_4'] = {
-  left: "250px",
-  bottom: "84px",
-}
-
-positions['pin_4'] = {
-  right: "25px",
-  bottom: "84px",
-}
-
-bg['pin_4'] = {
-  left: "-350px",
-  bottom: "0px"
+  right: "10px",
+  top: "10px"
 }
 
 var app = (function() {
@@ -92,9 +63,6 @@ var app = (function() {
 
     // Start tracking beacons!
     startScan();
-
-    // Display refresh timer.
-    updateTimer = setInterval(displayBeaconList, 100);
   }
 
   function startScan() {
@@ -131,58 +99,37 @@ var app = (function() {
     estimote.startRangingBeaconsInRegion({}, onBeaconsRanged, onError);
   }
 
-  function displayBeaconList() {
-
-    $.each(beacons, function(key, beacon) {
-      var pinHere = pin[beacon.minor];
-      var proximity = beacon.proximity;
-      var proximityNames = [
-        'Unknown',
-        'Immediate',
-        'Near',
-        'Far'
-      ];
-
-      if(proximityNames[proximity] == "Immediate") {
-        $(".im").removeAttr('style');
-        $(".im").css(positions[pinHere]);
-        //$('#mapa').css(bg[pinHere]);
-      }
-    });
-  }
-
   return app;
 })();
 
 app.initialize();
 
 function checkProximity(distance, meters, minor) {
-  if(beaconActive.minor != "") {
-    if(beaconActive.minor != minor) {
-      if (beaconActive.meters == meters && Math.round(distance) <= 2 && Math.round(beaconActive.distance) <= 2 ) {
-        
-      }
+  if(beaconActive.minor != "" && beaconActive.minor != minor) {
+    if (Math.round(distance) <= 2) {
+      beaconActive.minor = minor;
+      beaconActive.meters = meters;
+      beaconActive.distance = distance;
     }
   } else {
     beaconActive.distance = distance;
     beaconActive.meters = meters;
     beaconActive.minor = minor;
   }
+
+  addPin(beaconActive.minor);
 }
 
 // Move Pin in MAP
-function addPin(minor, proximity) {
+function addPin(minor) {
   var pinHere = pin[minor];
-  var proximityNames = [
-    'Unknown',
-    'Immediate',
-    'Near',
-    'Far'
-  ];
 
-  if(proximityNames[proximity] == "Immediate") {
-    $(".im").removeAttr('style');
-    $(".im").css(positions[pinHere]);
-    //$('#mapa').css(bg[pinHere]);
+  $(".im").removeAttr('style');
+
+  if(beaconActive.minor != minor) {
+    $("#mapa").removeAttr("style");
   }
+
+  $(".im").css(positions[pinHere]);
+  $('#mapa').animate(bg[pinHere], 500);
 }
