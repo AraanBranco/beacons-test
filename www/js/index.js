@@ -12,24 +12,25 @@ pin[2] = "pin_2";
 pin[3] = "pin_3";
 pin[4] = "pin_4";
 
+
 positions['pin_1'] = {
-  left: "90px",
-  bottom: "320px"
+  top: "390px",
+  left: "90px"
 }
 
 positions['pin_2'] = {
   left: "90px",
-  bottom: "30px",
-}
-
-positions['pin_4'] = {
-  right: "100px",
-  top: "20px"
+  top: "690px"
 }
 
 positions['pin_3'] = {
-  right: "100px",
-  bottom: "30px"
+  top: "690px",
+  left: "540px"
+}
+
+positions['pin_4'] = {
+  top: "20px",
+  left: "540px"
 }
 
 bg['pin_1'] = {
@@ -42,14 +43,14 @@ bg['pin_2'] = {
   left: "0px"
 }
 
-bg['pin_4'] = {
-  right: "10px",
-  top: "10px"
+bg['pin_3'] = {
+  top: "-200px",
+  left: "-310px"
 }
 
-bg['pin_3'] = {
-  right: "10px",
-  top: "-200px"
+bg['pin_4'] = {
+  top: "2px",
+  left: "-310px"
 }
 
 var app = (function() {
@@ -127,8 +128,6 @@ function checkProximity(distance, meters, minor) {
       beaconActive.minor = minor;
       beaconActive.meters = meters;
       beaconActive.distance = distance;
-
-      alert("PIN!! "+ minor);
       addPin(minor);
     }
   }
@@ -141,9 +140,6 @@ function checkProximity(distance, meters, minor) {
 // Move Pin in MAP
 function addPin(minor) {
   var pinHere = pin[minor];
-
-  $(".im").removeAttr('style');
-  $("#mapa").removeAttr("style");
 
   $(".im").animate(positions[pinHere], 500);
   $('#mapa').animate(bg[pinHere], 500);
